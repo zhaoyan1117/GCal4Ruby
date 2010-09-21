@@ -114,9 +114,12 @@ module GCal4Ruby
     end
     
     #Returns an array of Event objects corresponding to each event in the calendar.
-    def events
+    # query_params is a hash of parameters which can be found here
+    #  http://code.google.com/apis/gdata/docs/2.0/reference.html#Queries
+    # e.g {"max-results" => "50"} The default here is 10000
+    def events(query_params = {})
       events = []
-      ret = @service.send_request(GData4Ruby::Request.new(:get, @content_uri))
+      ret = @service.send_request(GData4Ruby::Request.new(:get, @content_uri, nil, nil, {"max-results" => "10000"}.merge(query_params)))
       REXML::Document.new(ret.body).root.elements.each("entry"){}.map do |entry|
         entry = GData4Ruby::Utils.add_namespaces(entry)
         e = Event.new(service)
@@ -160,7 +163,7 @@ module GCal4Ruby
     #Finds a Calendar based on a text query or by an id.  Parameters are:
     #*service*::  A valid Service object to search.
     #*query*:: either a string containing a text query to search by, or a hash containing an +id+ key with an associated id to find, or a +query+ key containint a text query to search for, or a +title+ key containing a title to search.
-    #*args*:: a hash containing optional additional query paramters to use.  See http://code.google.com/apis/gdata/docs/2.0/reference.html#Queries for a full list of possible values.  Example: 
+    #*query_params*:: a hash containing optional additional query paramters to use.  See http://code.google.com/apis/gdata/docs/2.0/reference.html#Queries for a full list of possible values.  Example: 
     # {'max-results' => '100'}
     #If an ID is specified, a single instance of the calendar is returned if found, otherwise false.
     #If a query term or title text is specified, and array of matching results is returned, or an empty array if nothing
@@ -171,7 +174,7 @@ module GCal4Ruby
         id = query[:id]
         puts "id passed, finding calendar by id" if service.debug
         puts "id = "+id if service.debug
-        d = service.send_request(GData4Ruby::Request.new(:get, CALENDAR_FEED+id, {"If-Not-Match" => "*"}))
+        d = service.send_request(GData4Ruby::Request.new(:get, CALENDAR_FEED+id,nil, {"If-None-Match" => "*"}, {"max-results" => "10000"}.merge(query_params)))
         puts d.inspect if service.debug
         if d
           return get_instance(service, d)

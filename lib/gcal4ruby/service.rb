@@ -78,11 +78,14 @@ module GCal4Ruby
   
     #Returns an array of Calendar objects for each calendar associated with 
     #the authenticated account.
-    def calendars
+    # query_params is a hash of parameters which can be found here
+    #  http://code.google.com/apis/gdata/docs/2.0/reference.html#Queries
+    # e.g {"max-results" => "50"} The default here is 10000
+    def calendars(query_params = {})
       if not @auth_token
          raise NotAuthenticated
       end
-      ret = send_request(GData4Ruby::Request.new(:get, CALENDAR_LIST_FEED, nil, {"max-results" => "10000"}))
+      ret = send_request(GData4Ruby::Request.new(:get, CALENDAR_LIST_FEED, nil, nil, {"max-results" => "10000"}.merge(query_params)))
       cals = []
       REXML::Document.new(ret.body).root.elements.each("entry"){}.map do |entry|
         entry = GData4Ruby::Utils.add_namespaces(entry)
@@ -94,11 +97,14 @@ module GCal4Ruby
     end
     
     #Returns an array of Event objects for each event in this account
-    def events
+    # query_params is a hash of parameters which can be found here
+    #  http://code.google.com/apis/gdata/docs/2.0/reference.html#Queries
+    # e.g {"max-results" => "50"} The default here is 10000
+    def events(query_params = {})
       if not @auth_token
          raise NotAuthenticated
       end
-      ret = send_request(GData4Ruby::Request.new(:get, default_event_feed, nil, {"max-results" => "10000"}))
+      ret = send_request(GData4Ruby::Request.new(:get, default_event_feed, nil, nil, {"max-results" => "10000"}.merge(query_params)))
       events = []
       REXML::Document.new(ret.body).root.elements.each("entry"){}.map do |entry|
         entry = GData4Ruby::Utils.add_namespaces(entry)

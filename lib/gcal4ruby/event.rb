@@ -369,7 +369,7 @@ module GCal4Ruby
         id = query[:id]
         puts "id passed, finding event by id" if service.debug
         puts "id = "+id if service.debug
-        d = service.send_request(GData4Ruby::Request.new(:get, "http://www.google.com/calendar/feeds/"+id, {"If-Not-Match" => "*"}))
+        d = service.send_request(GData4Ruby::Request.new(:get, "http://www.google.com/calendar/feeds/"+id, nil, {"If-None-Match" => "*"}))
         puts d.inspect if service.debug
         if d
           return get_instance(service, d)
