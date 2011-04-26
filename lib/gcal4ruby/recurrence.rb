@@ -67,7 +67,7 @@ module GCal4Ruby
         if key == 'RRULE'
           value.split(";").each do |rr| 
             rr_key, rr_value = rr.split("=")
-            rr_key = rr_key.downcase.to_sym
+            rr_key = rr_key && rr_key.downcase.to_sym
             unless @frequency.has_key?(rr_key)
               if rr_key == :until
                 @repeat_until = Time.parse_complete(rr_value)
