@@ -1,4 +1,15 @@
 #=CHANGELOG
+#=version 0.5.6
+#* Adds contributors to readme
+#* bugfix: sometimes, there are no times in the dates, so gsub is called on nil
+#* bug fix: recurrence hits nil with the rr_key 
+#* Adds support for params
+#* Formatted README to markdown for readability
+#* Add title attribute accessor for Calendar objects 
+#* enhance Event#find to accept a Calendar object arg 
+#* A small hack to prevent the values of start_time and end_time to be overwritten with the contents of the VTIMEZONE details in the gd:recurrence element
+#* Updated license to LGPL 
+#* update recurrence with fixes to to_s method 
 #==version 0.5.5 
 #* Fixed calendar::find method.  Thanks to AB <a.berezovskiy@gmail.com>.
 #* Improved recurrence handling.  Thanks to John Paul Narowski <jnarowski@gmail.com>.
