@@ -13,6 +13,20 @@ and is licenses under the LGPL v3.  Feel free to use and update, but be sure to 
 code back to the project and attribute as required by the license.  You can find the text of the LGPL 
 here: [http://www.gnu.org/licenses/lgpl.html](http://www.gnu.org/licenses/lgpl.html).
 
+With source contributions by:
+
+* iamwilhelm
+* aunderwo
+* John Paul Narowski (jnarowski)
+* Wil Chung (iamwilhelm)
+* wimm-dking
+* bruno
+
+With documentation contributions by:
+
+* SingAlong
+
+
 ##Website
 
 [http://cookingandcoding.com/gcal4ruby/](http://cookingandcoding.com/gcal4ruby/)
