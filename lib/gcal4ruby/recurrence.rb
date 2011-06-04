@@ -24,7 +24,7 @@ class Time
   end
   
   def self.parse_complete(value)
-    unless value.blank?
+    unless value.nil? || value.empty?
       if value.include?("T")
         d, h = value.split("T")
         return Time.parse(d+" "+h.gsub("Z", ""))
@@ -72,8 +72,10 @@ module GCal4Ruby
       @frequency = {}
       attrs = rec.split("\n")
       attrs.each do |val|
+        break if val == "BEGIN:VTIMEZONE" # Ignoring the time zone for now
         key, value = val.split(":")
         if key == 'RRULE'
+          args = {}
           value.split(";").each do |rr| 
             rr_key, rr_value = rr.split("=")
             rr_key = rr_key.downcase.to_sym
@@ -81,21 +83,36 @@ module GCal4Ruby
               if rr_key == :until
                 @repeat_until = Time.parse_complete(rr_value)
               else
-                @frequency[rr_key] = rr_value 
+                args[rr_key] = rr_value 
               end
             end
           end
+          case args[:freq]
+          when 'DAILY'
+            @frequency['daily'] = true
+          when 'WEEKLY'
+            @frequency['weekly'] = args[:byday].split(',')
+          when 'MONTHLY'
+            if args[:byday]
+              @frequency['monthly'] = args[:byday]
+              @frequency[:day_of_week] = true
+            else
+              @frequency['monthly'] = args[:bymonthday].to_i
+            end
+          when 'YEARLY'
+            @frequency['yearly'] = args[:byyearday].to_i
+          end
         elsif key == 'INTERVAL'
-          @frequency[:interval] = value.to_i unless value.blank?
-        elsif key.include?("DTSTART;TZID") or key.include?("DTSTART") or key.include?('DTSTART;VALUE=DATE-TIME')
-          @start_time ||= Time.parse_complete(value)
+          @frequency[:interval] = value.to_i unless value.nil? || value.empty?
         elsif key.include?('DTSTART;VALUE=DATE')
           @start_time ||= Time.parse(value)
           @all_day = true
-        elsif key.include?("DTEND;TZID") or key.include?("DTEND") or key.include?('DTEND;VALUE=DATE-TIME')
-          @end_time ||= Time.parse_complete(value)
+        elsif key.include?("DTSTART;TZID") or key.include?("DTSTART") or key.include?('DTSTART;VALUE=DATE-TIME')
+          @start_time ||= Time.parse_complete(value)
         elsif key.include?('DTEND;VALUE=DATE')
           @end_time ||= Time.parse(value)
+        elsif key.include?("DTEND;TZID") or key.include?("DTEND") or key.include?('DTEND;VALUE=DATE-TIME')
+          @end_time ||= Time.parse_complete(value)
         end
       end
       @frequency[:interval] = 1 unless @frequency[:interval] && @frequency[:interval].to_i > 0
@@ -119,22 +136,22 @@ module GCal4Ruby
           else
             value = v
           end
-          f += "#{key} " if key != 'interval'
+          f += "#{key}" if key != 'interval'
           case key
             when "secondly"
-            by += "every #{value} second"
+            by += " every #{value} second"
             when "minutely"
-            by += "every #{value} minute"
+            by += " every #{value} minute"
             when "hourly"
-            by += "every #{value} hour"
+            by += " every #{value} hour"
             when "weekly"
-            by += "on #{value}" if value
+            by += " on #{value}" if value
             when "monthly"
-            by += "on #{value}"
+            by += " on #{value}"
             when "yearly"
-            by += "on the #{value} day of the year"
+            by += " on the #{value} day of the year"
             when 'interval'
-            i += "for #{value} times"
+            i += " for #{value} times"
           end
         end
         output += f+i+by
