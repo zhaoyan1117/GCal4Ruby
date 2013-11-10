@@ -67,7 +67,12 @@ module GCal4Ruby
   
     # The authenticate method passes the username and password to google servers.  
     # If authentication succeeds, returns true, otherwise raises the AuthenticationFailed error.
-    def authenticate(username, password, service='cl')
+    def authenticate(username=nil, password=nil, service='cl')
+
+      # If no param given, using the values in config.
+      username ||= GCal4Ruby.configuration.username
+      password ||= GCal4Ruby.configuration.password
+
       super(username, password, service)
     end
     
