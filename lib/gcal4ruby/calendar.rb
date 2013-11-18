@@ -211,6 +211,15 @@ module GCal4Ruby
       end
     end
     
+    #Get the xml feed address of the calendar.
+    def get_xml_feed
+      "https://www.google.com/calendar/feeds/#{id}/public/basic"    
+    end
+
+    def self.get_xml_feed(id)
+      "https://www.google.com/calendar/feeds/#{id}/public/basic"    
+    end
+
     #Returns the xml representation of the Calenar.
     def to_xml
       xml = REXML::Document.new(super)
